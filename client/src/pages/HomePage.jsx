@@ -1,4 +1,5 @@
 import React from "react";
+import { motion } from "framer-motion";
 import NavBar from "../components/NavBar";
 import {
   Button,
@@ -47,6 +48,45 @@ const StyledButton = styled(Button)(({ theme }) => ({
   textTransform: "none",
   fontSize: "1rem",
 }));
+
+// Animation variants
+const fadeIn = {
+  initial: { opacity: 0, y: 20 },
+  animate: { opacity: 1, y: 0 },
+  exit: { opacity: 0, y: 20 }
+};
+
+const staggerContainer = {
+  animate: {
+    transition: {
+      staggerChildren: 0.2
+    }
+  }
+};
+
+const scaleIn = {
+  initial: { scale: 0.8, opacity: 0 },
+  animate: { 
+    scale: 1, 
+    opacity: 1,
+    transition: {
+      type: "spring",
+      stiffness: 100
+    }
+  }
+};
+
+const slideIn = {
+  initial: { x: -60, opacity: 0 },
+  animate: { 
+    x: 0, 
+    opacity: 1,
+    transition: {
+      type: "spring",
+      stiffness: 100
+    }
+  }
+};
 
 const HomePage = () => {
   const partners = [
@@ -107,6 +147,10 @@ const HomePage = () => {
     >
       {/* Hero Section */}
       <Box
+        component={motion.div}
+        initial="initial"
+        animate="animate"
+        exit="exit"
         sx={{
           height: "100vh",
           position: "relative",
@@ -131,60 +175,81 @@ const HomePage = () => {
           sx={{ position: "relative", zIndex: 1, pt: 15 }}
         >
           <Box sx={{ textAlign: "center", maxWidth: "800px", mx: "auto" }}>
-            <WelcomeBadge label="Welcome to ReStory" />
+            <motion.div variants={fadeIn}>
+              <WelcomeBadge label="Welcome to ReStory" />
+            </motion.div>
 
-            <Typography
-              variant="h1"
-              sx={{
-                fontSize: { xs: "3rem", md: "4.5rem" },
-                fontWeight: "bold",
-                color: "white",
-                mt: 4,
-                textShadow: "2px 2px 4px rgba(0,0,0,0.3)",
-              }}
+            <motion.div
+              variants={fadeIn}
+              transition={{ delay: 0.2 }}
             >
-              Affordable Books
               <Typography
-                component="span"
                 variant="h1"
-                color="primary"
                 sx={{
-                  display: "block",
-                  fontSize: "inherit",
-                  fontWeight: "inherit",
+                  fontSize: { xs: "3rem", md: "4.5rem" },
+                  fontWeight: "bold",
+                  color: "white",
+                  mt: 4,
+                  textShadow: "2px 2px 4px rgba(0,0,0,0.3)",
                 }}
               >
-                Buy or Sell
+                Affordable Books
+                <Typography
+                  component={motion.span}
+                  variants={fadeIn}
+                  transition={{ delay: 0.4 }}
+                  color="primary"
+                  sx={{
+                    display: "block",
+                    fontSize: "inherit",
+                    fontWeight: "inherit",
+                  }}
+                >
+                  Buy or Sell
+                </Typography>
               </Typography>
-            </Typography>
+            </motion.div>
 
-            <Typography
-              variant="h5"
-              sx={{
-                color: "rgba(255,255,255,0.9)",
-                mt: 3,
-                maxWidth: "600px",
-                mx: "auto",
-              }}
+            <motion.div
+              variants={fadeIn}
+              transition={{ delay: 0.6 }}
             >
-              Join our community of book lovers and discover amazing deals on
-              your favorite titles
-            </Typography>
+              <Typography
+                variant="h5"
+                sx={{
+                  color: "rgba(255,255,255,0.9)",
+                  mt: 3,
+                  maxWidth: "600px",
+                  mx: "auto",
+                }}
+              >
+                Join our community of book lovers and discover amazing deals on
+                your favorite titles
+              </Typography>
+            </motion.div>
 
             <Box
+              component={motion.div}
+              variants={staggerContainer}
+              initial="initial"
+              animate="animate"
               sx={{ mt: 6, display: "flex", gap: 2, justifyContent: "center" }}
             >
-              <StyledButton variant="contained" endIcon={<ArrowForwardIcon />}>
-                Start Browsing
-              </StyledButton>
-              <StyledButton
-                variant="outlined"
-                color="primary"
-                endIcon={<MenuBookIcon />}
-                sx={{ color: "white", borderColor: "white" }}
-              >
-                Sell Your Books
-              </StyledButton>
+              <motion.div variants={slideIn}>
+                <StyledButton variant="contained" endIcon={<ArrowForwardIcon />}>
+                  Start Browsing
+                </StyledButton>
+              </motion.div>
+              <motion.div variants={slideIn}>
+                <StyledButton
+                  variant="outlined"
+                  color="primary"
+                  endIcon={<MenuBookIcon />}
+                  sx={{ color: "white", borderColor: "white" }}
+                >
+                  Sell Your Books
+                </StyledButton>
+              </motion.div>
             </Box>
           </Box>
         </Container>
@@ -192,128 +257,149 @@ const HomePage = () => {
 
       {/* Features Section */}
       <Container maxWidth="lg" sx={{ py: 10 }}>
-        <Grid container spacing={4}>
-          {features.map((feature, index) => (
-            <Grid item xs={12} md={4} key={index}>
-              <StyledCard>
-                <CardContent sx={{ textAlign: "center", p: 4 }}>
-                  <Box
-                    sx={{
-                      bgcolor: "primary.main",
-                      width: 60,
-                      height: 60,
-                      borderRadius: "50%",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      mx: "auto",
-                      mb: 3,
-                      color: "white",
-                    }}
-                  >
-                    {feature.icon}
-                  </Box>
-                  <Typography variant="h5" sx={{ color: "white", mb: 2 }}>
-                    {feature.title}
-                  </Typography>
-                  <Typography
-                    variant="body1"
-                    sx={{ color: "rgba(255,255,255,0.7)" }}
-                  >
-                    {feature.description}
-                  </Typography>
-                </CardContent>
-              </StyledCard>
-            </Grid>
-          ))}
-        </Grid>
+        <motion.div
+          variants={staggerContainer}
+          initial="initial"
+          whileInView="animate"
+          viewport={{ once: true, amount: 0.3 }}
+        >
+          <Grid container spacing={4}>
+            {features.map((feature, index) => (
+              <Grid item xs={12} md={4} key={index}>
+                <motion.div variants={scaleIn}>
+                  <StyledCard>
+                    <CardContent sx={{ textAlign: "center", p: 4 }}>
+                      <Box
+                        sx={{
+                          bgcolor: "primary.main",
+                          width: 60,
+                          height: 60,
+                          borderRadius: "50%",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          mx: "auto",
+                          mb: 3,
+                          color: "white",
+                        }}
+                      >
+                        {feature.icon}
+                      </Box>
+                      <Typography variant="h5" sx={{ color: "white", mb: 2 }}>
+                        {feature.title}
+                      </Typography>
+                      <Typography
+                        variant="body1"
+                        sx={{ color: "rgba(255,255,255,0.7)" }}
+                      >
+                        {feature.description}
+                      </Typography>
+                    </CardContent>
+                  </StyledCard>
+                </motion.div>
+              </Grid>
+            ))}
+          </Grid>
+        </motion.div>
       </Container>
 
       {/* Partners Section */}
       <Box sx={{ bgcolor: "rgba(0,0,0,0.3)", py: 10 }}>
         <Container maxWidth="lg">
-          <Typography
-            variant="h3"
-            align="center"
-            sx={{ color: "white", mb: 2 }}
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            transition={{ duration: 0.6 }}
+            viewport={{ once: true }}
           >
-            Trusted by Leading Publishers
-          </Typography>
-          <Typography
-            variant="h6"
-            align="center"
-            sx={{ color: "rgba(255,255,255,0.7)", mb: 6 }}
-          >
-            We partner with the world's best publishers to bring you quality
-            books
-          </Typography>
+            <Typography
+              variant="h3"
+              align="center"
+              sx={{ color: "white", mb: 2 }}
+            >
+              Trusted by Leading Publishers
+            </Typography>
+          </motion.div>
 
-          <Grid container spacing={4}>
-            {partners.map((partner) => (
-              <Grid item xs={12} sm={6} md={3} key={partner.name}>
-                <StyledCard>
-                  <CardContent sx={{ textAlign: "center", p: 4 }}>
-                    <Box
-                      sx={{
-                        height: 100,
-                        mb: 3,
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                      }}
-                    >
-                      <Box
-                        component="img"
-                        src={partner.logo}
-                        alt={`${partner.name} logo`}
-                        sx={{
-                          maxWidth: "80%",
-                          maxHeight: "100%",
-                          objectFit: "contain",
-                          display: "block",
-                        }}
-                      />
-                    </Box>
-                    <Typography variant="h6" sx={{ color: "white", mb: 1 }}>
-                      {partner.name}
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      sx={{ color: "rgba(255,255,255,0.7)", mb: 2 }}
-                    >
-                      {partner.description}
-                    </Typography>
-                    <Box
-                      sx={{
-                        display: "flex",
-                        gap: 1,
-                        justifyContent: "center",
-                        flexWrap: "wrap",
-                      }}
-                    >
-                      <Chip
-                        label={partner.years}
-                        size="small"
-                        sx={{
-                          bgcolor: "rgba(255,255,255,0.1)",
-                          color: "white",
-                        }}
-                      />
-                      <Chip
-                        label={`${partner.books} Books`}
-                        size="small"
-                        variant="outlined"
-                        sx={{
-                          color: "white",
-                          borderColor: "rgba(255,255,255,0.3)",
-                        }}
-                      />
-                    </Box>
-                  </CardContent>
-                </StyledCard>
-              </Grid>
-            ))}
-          </Grid>
+          <motion.div
+            variants={staggerContainer}
+            initial="initial"
+            whileInView="animate"
+            viewport={{ once: true, amount: 0.3 }}
+          >
+            <Grid container spacing={4}>
+              {partners.map((partner, index) => (
+                <Grid item xs={12} sm={6} md={3} key={partner.name}>
+                  <motion.div
+                    variants={scaleIn}
+                    whileHover={{ scale: 1.05 }}
+                    transition={{ type: "spring", stiffness: 300 }}
+                  >
+                    <StyledCard>
+                      <CardContent sx={{ textAlign: "center", p: 4 }}>
+                        <Box
+                          sx={{
+                            height: 100,
+                            mb: 3,
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                          }}
+                        >
+                          <Box
+                            component="img"
+                            src={partner.logo}
+                            alt={`${partner.name} logo`}
+                            sx={{
+                              maxWidth: "80%",
+                              maxHeight: "100%",
+                              objectFit: "contain",
+                              display: "block",
+                            }}
+                          />
+                        </Box>
+                        <Typography variant="h6" sx={{ color: "white", mb: 1 }}>
+                          {partner.name}
+                        </Typography>
+                        <Typography
+                          variant="body2"
+                          sx={{ color: "rgba(255,255,255,0.7)", mb: 2 }}
+                        >
+                          {partner.description}
+                        </Typography>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            gap: 1,
+                            justifyContent: "center",
+                            flexWrap: "wrap",
+                          }}
+                        >
+                          <Chip
+                            label={partner.years}
+                            size="small"
+                            sx={{
+                              bgcolor: "rgba(255,255,255,0.1)",
+                              color: "white",
+                            }}
+                          />
+                          <Chip
+                            label={`${partner.books} Books`}
+                            size="small"
+                            variant="outlined"
+                            sx={{
+                              color: "white",
+                              borderColor: "rgba(255,255,255,0.3)",
+                            }}
+                          />
+                        </Box>
+                      </CardContent>
+                    </StyledCard>
+                  </motion.div>
+                </Grid>
+              ))}
+            </Grid>
+          </motion.div>
         </Container>
       </Box>
 
