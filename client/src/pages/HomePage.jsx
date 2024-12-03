@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import NavBar from "../components/NavBar";
 import {
@@ -19,6 +19,8 @@ import MenuBookIcon from "@mui/icons-material/MenuBook";
 import LocalLibraryIcon from "@mui/icons-material/LocalLibrary";
 import BookmarkIcon from "@mui/icons-material/Bookmark";
 import Footer from "../components/Footer";
+import { Navigate, useNavigate } from "react-router-dom";
+import { toast } from "react-hot-toast";
 
 // Styled components for custom effects
 const StyledCard = styled(Card)(({ theme }) => ({
@@ -41,6 +43,7 @@ const WelcomeBadge = styled(Chip)(({ theme }) => ({
     fontSize: "1rem",
   },
 }));
+
 
 const StyledButton = styled(Button)(({ theme }) => ({
   padding: theme.spacing(1.5, 3),
@@ -89,6 +92,37 @@ const slideIn = {
 };
 
 const HomePage = () => {
+  const navigate = useNavigate();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    // Check token on component mount
+    const token = localStorage.getItem('token');
+    setIsLoggedIn(!!token);
+  }, []);
+
+  const handleBrowseClick = () => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      navigate('/buy');
+      toast.success('Welcome to our book collection!');
+    } else {
+      navigate('/login');
+      toast.error('Please login to browse books');
+    }
+  };
+
+  const handleSellClick = () => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      navigate('/sell');
+      toast.success('List your books for sale!');
+    } else {
+      navigate('/login');
+      toast.error('Please login to sell books');
+    }
+  };
+
   const partners = [
     {
       name: "Penguin India",
@@ -236,19 +270,46 @@ const HomePage = () => {
               sx={{ mt: 6, display: "flex", gap: 2, justifyContent: "center" }}
             >
               <motion.div variants={slideIn}>
-                <StyledButton variant="contained" endIcon={<ArrowForwardIcon />}>
-                  Start Browsing
-                </StyledButton>
+                <Button
+                  variant="contained"
+                  size="large"
+                  onClick={handleBrowseClick}
+                  endIcon={<ArrowForwardIcon />}
+                  sx={{
+                    px: 4,
+                    py: 2,
+                    fontSize: "1.1rem",
+                    background: "linear-gradient(45deg, #3b82f6, #60a5fa)",
+                    "&:hover": {
+                      background: "linear-gradient(45deg, #2563eb, #3b82f6)",
+                    },
+                    width: { xs: "100%", sm: "auto" },
+                  }}
+                >
+                  {isLoggedIn ? 'Browse Books' : 'Start Browsing'}
+                </Button>
               </motion.div>
               <motion.div variants={slideIn}>
-                <StyledButton
+                <Button
                   variant="outlined"
-                  color="primary"
+                  size="large"
+                  onClick={handleSellClick}
                   endIcon={<MenuBookIcon />}
-                  sx={{ color: "white", borderColor: "white" }}
+                  sx={{
+                    px: 4,
+                    py: 2,
+                    fontSize: "1.1rem",
+                    color: "white",
+                    borderColor: "white",
+                    "&:hover": {
+                      borderColor: "#3b82f6",
+                      backgroundColor: "rgba(59, 130, 246, 0.1)",
+                    },
+                    width: { xs: "100%", sm: "auto" },
+                  }}
                 >
-                  Sell Your Books
-                </StyledButton>
+                  {isLoggedIn ? 'List Your Books' : 'Start Selling'}
+                </Button>
               </motion.div>
             </Box>
           </Box>

@@ -81,7 +81,8 @@ const LoginPage = () => {
       })
       console.log("Logged in");
       const token = response.data.token
-      window.localStorage.setItem("token" , token)
+      window.localStorage.setItem("token" , token);
+      navigation('/buy')
     } catch (error) {
       console.error("Login failed:", error);
       setError(error.response?.data?.message || "Login failed");

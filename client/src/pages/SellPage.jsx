@@ -1,30 +1,46 @@
+import { motion } from "framer-motion";
 import React, { useState } from "react";
 import axios from "axios";
-import { FaCloudUploadAlt } from "react-icons/fa";
-import { 
-  TextField, 
+import { toast } from "react-hot-toast";
+import {
+  Box,
   Container,
-  Paper,
   Typography,
   Grid,
-  Snackbar,
-  Alert,
+  TextField,
+  Button,
   Card,
   CardContent,
-  Button,
-  Box,
   MenuItem,
-} from '@mui/material';
-import { BiBook, BiUser, BiCalendar, BiCategory, BiDollar, BiImage } from 'react-icons/bi';
+} from "@mui/material";
 import { styled } from "@mui/material/styles";
-import { motion } from "framer-motion";
 import NavBar from "../components/NavBar";
 import Footer from "../components/Footer";
+
+// Animation variants
+const fadeIn = {
+  initial: { opacity: 0, y: 20 },
+  animate: { opacity: 1, y: 0 },
+  exit: { opacity: 0, y: 20 }
+};
+
+const staggerContainer = {
+  animate: {
+    transition: {
+      staggerChildren: 0.2
+    }
+  }
+};
+
+// Styled Components
 const StyledCard = styled(Card)(({ theme }) => ({
   background: "rgba(31, 41, 55, 0.5)",
   backdropFilter: "blur(10px)",
   border: "1px solid rgba(75, 85, 99, 0.3)",
-  boxShadow: "0 8px 32px rgba(0, 0, 0, 0.2)",
+  transition: "transform 0.3s ease",
+  "&:hover": {
+    transform: "translateY(-5px)",
+  },
 }));
 
 const StyledTextField = styled(TextField)(({ theme }) => ({
@@ -43,130 +59,81 @@ const StyledTextField = styled(TextField)(({ theme }) => ({
   "& .MuiInputLabel-root": {
     color: "rgba(255, 255, 255, 0.7)",
   },
-  "& .MuiSelect-icon": {
-    color: "rgba(255, 255, 255, 0.7)",
-  },
-  "& .MuiMenuItem-root": {
-    color: "black",
-  }
 }));
 
-// Animation variants
-const fadeIn = {
-  initial: { opacity: 0, y: 20 },
-  animate: { opacity: 1, y: 0 },
-  exit: { opacity: 0, y: 20 }
-};
-
-const staggerContainer = {
-  animate: {
-    transition: {
-      staggerChildren: 0.2
-    }
-  }
-};
-
 const SellPage = () => {
-  const [bookDetails, setBookDetails] = useState({
+  const [formData, setFormData] = useState({
     title: "",
     author: "",
     publicationYear: "",
     genre: "",
     price: "",
     imageURL: "",
+    description: "",
+    condition: "Good", // Default condition
   });
 
-  const [notification, setNotification] = useState({
-    open: false,
-    message: "",
-    severity: "success",
-  });
-
-  const bookGenres = [
-    "Fiction",
-    "Non-Fiction",
-    "Science Fiction",
-    "Biography",
-    "History",
-    "Romance",
-    "Mystery",
-    "Other",
-  ];
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setBookDetails((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const requiredFields = [
-        "title",
-        "author",
-        "publicationYear",
-        "genre",
-        "price",
-      ];
-      const missingFields = requiredFields.filter(
-        (field) => !bookDetails[field]
-      );
-
-      if (missingFields.length > 0) {
-        setNotification({
-          open: true,
-          message: `Please fill in all required fields: ${missingFields.join(
-            ", "
-          )}`,
-          severity: "error",
-        });
-        return;
-      }
-
-      await axios.post("http://localhost:3000/api/books/sell", {
-        ...bookDetails,
-        price: parseFloat(bookDetails.price),
-        publicationYear: parseInt(bookDetails.publicationYear),
-      });
-
-      setBookDetails({
+      const response = await axios.post('http://localhost:3000/api/books/sell', formData);
+      toast.success('Book listed for sale successfully!'); // Success toast
+      setFormData({
         title: "",
         author: "",
         publicationYear: "",
         genre: "",
         price: "",
         imageURL: "",
-      });
-
-      setNotification({
-        open: true,
-        message: "Book successfully listed for sale!",
-        severity: "success",
+        description: "",
+        condition: "Good",
       });
     } catch (error) {
-      setNotification({
-        open: true,
-        message:
-          error.response?.data?.message || "Failed to list book for sale",
-        severity: "error",
-      });
+      console.error('Error listing book:', error);
+      toast.error('Failed to list book for sale'); // Error toast
     }
   };
 
-  const handleCloseNotification = (_, reason) => {
-    if (reason === "clickaway") return;
-    setNotification((prev) => ({ ...prev, open: false }));
-  };
+  // Add genres array
+  const genres = [
+    "Fiction",
+    "Non-Fiction",
+    "Mystery",
+    "Science Fiction",
+    "Fantasy",
+    "Romance",
+    "Thriller",
+    "Horror",
+    "Historical Fiction",
+    "Biography",
+    "Autobiography",
+    "Self-Help",
+    "Business",
+    "Technology",
+    "Science",
+    "Poetry",
+    "Drama",
+    "Children's",
+    "Young Adult",
+    "Educational",
+    "Academic",
+    "Art & Photography",
+    "Cooking",
+    "Travel",
+    "Religion & Spirituality",
+    "Philosophy"
+  ];
 
   return (
     <Box 
       sx={{ 
         minHeight: "100vh", 
         position: "relative",
-        background: "#1a1a1a",
+        background: "#1a1a1a", 
       }}
     >
       {/* Background with fade */}
@@ -245,8 +212,8 @@ const SellPage = () => {
                               fullWidth
                               label="Book Title"
                               name="title"
-                              value={bookDetails.title}
-                              onChange={handleInputChange}
+                              value={formData.title}
+                              onChange={handleChange}
                               required
                             />
                           </motion.div>
@@ -259,8 +226,8 @@ const SellPage = () => {
                               fullWidth
                               label="Author"
                               name="author"
-                              value={bookDetails.author}
-                              onChange={handleInputChange}
+                              value={formData.author}
+                              onChange={handleChange}
                               required
                             />
                           </motion.div>
@@ -274,8 +241,8 @@ const SellPage = () => {
                               label="Publication Year"
                               name="publicationYear"
                               type="number"
-                              value={bookDetails.publicationYear}
-                              onChange={handleInputChange}
+                              value={formData.publicationYear}
+                              onChange={handleChange}
                               required
                               inputProps={{ min: 1800, max: new Date().getFullYear() }}
                             />
@@ -289,14 +256,15 @@ const SellPage = () => {
                               label="Genre"
                               name="genre"
                               select
-                              value={bookDetails.genre}
-                              onChange={handleInputChange}
+                              value={formData.genre}
+                              onChange={handleChange}
                               required
                               SelectProps={{
                                 MenuProps: {
                                   PaperProps: {
                                     sx: {
                                       bgcolor: 'white',
+                                      maxHeight: '400px',
                                       '& .MuiMenuItem-root': {
                                         color: 'black',
                                       },
@@ -305,7 +273,7 @@ const SellPage = () => {
                                 },
                               }}
                             >
-                              {bookGenres.map((genre) => (
+                              {genres.map((genre) => (
                                 <MenuItem key={genre} value={genre}>
                                   {genre}
                                 </MenuItem>
@@ -322,8 +290,8 @@ const SellPage = () => {
                               label="Price ($)"
                               name="price"
                               type="number"
-                              value={bookDetails.price}
-                              onChange={handleInputChange}
+                              value={formData.price}
+                              onChange={handleChange}
                               required
                               inputProps={{ min: 0, step: "0.01" }}
                             />
@@ -336,8 +304,8 @@ const SellPage = () => {
                               fullWidth
                               label="Image URL"
                               name="imageURL"
-                              value={bookDetails.imageURL}
-                              onChange={handleInputChange}
+                              value={formData.imageURL}
+                              onChange={handleChange}
                               placeholder="https://example.com/book-image.jpg"
                             />
                           </motion.div>
@@ -352,8 +320,8 @@ const SellPage = () => {
                               name="description"
                               multiline
                               rows={4}
-                              value={bookDetails.description}
-                              onChange={handleInputChange}
+                              value={formData.description}
+                              onChange={handleChange}
                               placeholder="Add a detailed description of your book..."
                             />
                           </motion.div>
@@ -367,8 +335,8 @@ const SellPage = () => {
                               label="Book Condition"
                               name="condition"
                               select
-                              value={bookDetails.condition || 'Good'}
-                              onChange={handleInputChange}
+                              value={formData.condition}
+                              onChange={handleChange}
                               required
                               SelectProps={{
                                 MenuProps: {
@@ -383,7 +351,7 @@ const SellPage = () => {
                                 },
                               }}
                             >
-                              {['New', 'Like New', 'Very Good', 'Good', 'Fair'].map((condition) => (
+                              {['new', 'like new', 'Good', 'acceptable', 'damaged'].map((condition) => (
                                 <MenuItem key={condition} value={condition}>
                                   {condition}
                                 </MenuItem>
@@ -424,27 +392,8 @@ const SellPage = () => {
             </motion.div>
           </Grid>
         </Grid>
-
-        {/* Notification */}
-        {notification.message && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
-          >
-            <Alert
-              severity={notification.severity}
-              onClose={() => setNotification({ severity: "", message: "" })}
-              sx={{ mt: 3 }}
-            >
-              {notification.message}
-            </Alert>
-          </motion.div>
-        )}
       </Container>
 
-      <Footer />
     </Box>
   );
 };
