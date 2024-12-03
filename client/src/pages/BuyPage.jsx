@@ -145,7 +145,6 @@ const BuyPage = () => {
         background: "#1a1a1a", 
       }}
     >
-      {/* Background */}
       <Box
         component={motion.div}
         initial={{ opacity: 0.5 }}
@@ -287,7 +286,7 @@ const BuyPage = () => {
               <Grid item xs={12} sm={6} md={4} key={book._id}>
                 <motion.div variants={fadeIn}>
                   <StyledCard>
-                    <Box sx={{ position: "relative", paddingTop: "140%" }}>
+                    <Box sx={{ position: "relative", paddingTop: "80%" }}>
                       <img
                         src={book.imageURL || 'https://via.placeholder.com/300x400?text=No+Image'}
                         alt={book.title}
@@ -312,13 +311,16 @@ const BuyPage = () => {
                         by {book.author}
                       </Typography>
                       <Typography sx={{ color: "rgba(255, 255, 255, 0.7)", mb: 1 }}>
-                        {book.genre}
+                        Genre: {book.genre}
                       </Typography>
                       <Typography sx={{ color: "rgba(255, 255, 255, 0.7)", mb: 1 }}>
                         Year: {book.publicationYear}
                       </Typography>
-                      <Typography sx={{ color: "white", fontWeight: "bold", mb: 2 }}>
+                      <Typography sx={{ color: "white", fontWeight: "bold", mb: 1 }}>
                         ${book.price}
+                      </Typography>
+                      <Typography sx={{ color: "white", fontWeight: "semi-bold", mb: 2 }}>
+                        Condition: {book.condition}
                       </Typography>
                       <Typography 
                         sx={{ 

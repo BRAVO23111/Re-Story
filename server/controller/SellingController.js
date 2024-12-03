@@ -12,7 +12,7 @@ export const getBooksAvailableToBuy = async (req, res) => {
 
 // Add a book for sale
 export const addBookForSale = async (req, res) => {
-    const { title, author, publicationYear, genre, price, imageURL } = req.body;
+    const { title, author, publicationYear, genre, price, imageURL, condition } = req.body;
 
     const newBook = new Books({
         title,
@@ -21,8 +21,9 @@ export const addBookForSale = async (req, res) => {
         genre,
         price,
         imageURL,
+        condition,
         transactionType: "sell",
-        sold: false, // Default to unsold
+        sold: false,
     });
 
     try {
