@@ -9,10 +9,11 @@ import { BooksSellingRoutes } from "./routes/BooksSellingRoutes.js";
 dotenv.config();
 const app = express();
 app.use(cors({
-    origin: process.env.VITE_URL || 'http://localhost:5173/',
+    origin: process.env.VITE_URL || 'http://localhost:5173',
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true
-}))
+}));
+app.use(express.urlencoded({ extended: true }));  // for parsing application/x-www-form-urlencoded
 app.use(express.json());
 const db = mongoose.connect(process.env.MONGO_URI)
 try {
@@ -25,9 +26,9 @@ try {
 
 app.use("/api/auth" , UserRouter);
 app.use("/api/books" , BooksSellingRoutes);
-app.get('/' ,(req,res)=>{
-    res.send("Hello World");
-})
+// app.get('/' ,(req,res)=>{
+//     res.send("Hello World");
+// })
 const PORT = 3000 || process.env.PORT
 app.listen(PORT , (req,res)=>{
     console.log(`Server running on port ${PORT}`);

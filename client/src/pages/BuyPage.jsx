@@ -77,7 +77,7 @@ const BuyPage = () => {
   // Fetch books from the server
   const fetchBooks = async () => {
     try {
-      const response = await api.get('/api/books');
+      const response = await api.get('/api/books/sale');
       setBooks(response.data);
       setFilteredBooks(response.data);
     } catch (error) {
