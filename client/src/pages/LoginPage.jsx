@@ -20,7 +20,7 @@ import {
   VisibilityOff as VisibilityOffIcon 
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
-import axios from 'axios';
+import api from '../config/config';
 import { useDispatch } from 'react-redux';
 import { login } from "../store/slices/authSlice";
 
@@ -75,7 +75,7 @@ const LoginPage = () => {
       return;
     }
     try {
-      const response = await axios.post("http://localhost:3000/api/auth/login", {
+      const response = await api.post("/api/auth/login", {
         email,
         password,
       });

@@ -15,7 +15,7 @@ import {
   MenuItem,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import axios from "axios";
+import api from '../config/config';
 import { toast } from "react-hot-toast";
 
 // Animation variants
@@ -77,12 +77,12 @@ const BuyPage = () => {
   // Fetch books from the server
   const fetchBooks = async () => {
     try {
-      const response = await axios.get('http://localhost:3000/api/books/sale');
+      const response = await api.get('/api/books');
       setBooks(response.data);
       setFilteredBooks(response.data);
     } catch (error) {
       console.error('Error fetching books:', error);
-      toast.error('Failed to load books');
+      toast.error('Failed to fetch books');
     }
   };
 

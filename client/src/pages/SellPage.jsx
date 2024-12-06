@@ -16,6 +16,7 @@ import {
 import { styled } from "@mui/material/styles";
 import NavBar from "../components/NavBar";
 import Footer from "../components/Footer";
+import api from '../config/config';
 
 // Animation variants
 const fadeIn = {
@@ -80,8 +81,8 @@ const SellPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:3000/api/books/sell', formData);
-      toast.success('Book listed for sale successfully!'); // Success toast
+      const response = await api.post('/api/books/sell', formData);
+      toast.success('Book listed for sale successfully!');
       setFormData({
         title: "",
         author: "",
@@ -94,7 +95,7 @@ const SellPage = () => {
       });
     } catch (error) {
       console.error('Error listing book:', error);
-      toast.error('Failed to list book for sale'); // Error toast
+      toast.error('Failed to list book for sale');
     }
   };
 
