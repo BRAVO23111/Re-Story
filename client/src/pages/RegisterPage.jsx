@@ -23,7 +23,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { login } from "../store/slices/authSlice";
-import axios from 'axios';
+import api from '../config/config';
 
 const StyledCard = styled(Card)(({ theme }) => ({
   background: "rgba(31, 41, 55, 0.5)",
@@ -107,7 +107,7 @@ const RegisterPage = () => {
     if (!validateForm()) return;
 
     try {
-      const response = await axios.post("http://localhost:3000/api/auth/register", {
+      const response = await api.post("/api/auth/register", {
         firstname,
         lastname,
         email,
