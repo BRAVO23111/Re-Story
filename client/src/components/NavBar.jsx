@@ -2,29 +2,41 @@ import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { FaBook, FaBars, FaTimes, FaUserCircle } from "react-icons/fa";
+import { useDispatch, useSelector } from "react-redux";
+import { login, logout } from "../store/slices/authSlice";
 
 const NavBar = () => {
   const navigate = useNavigate();
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const dispatch = useDispatch();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [username, setUsername] = useState("");
+
+  const { isLoggedIn, username } = useSelector((state) => state.auth);
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    const storedUsername = localStorage.getItem('username');
-    if (token) {
-      setIsLoggedIn(true);
-      setUsername(storedUsername || "User");
+    console.log("Current username:", username);
+    console.log("Is logged in:", isLoggedIn);
+  }, [username, isLoggedIn]);
+
+  useEffect(() => {
+    const token = window.localStorage.getItem("token");
+    const storedUsername = window.localStorage.getItem("username");
+    
+    if (token && storedUsername) {
+      console.log("Dispatching login with username:", storedUsername);
+      dispatch(login({ 
+        username: storedUsername, 
+        token 
+      }));
     }
-  }, []);
+  }, [dispatch]);
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('username');
-    setIsLoggedIn(false);
-    setUsername("");
-    toast.success('Logged out successfully');
-    navigate('/');
+    localStorage.removeItem("token");
+    localStorage.removeItem("username");
+    localStorage.removeItem("registeredEmail");
+    dispatch(logout());
+    toast.success("Logged out successfully");
+    navigate("/");
   };
 
   return (
@@ -49,62 +61,40 @@ const NavBar = () => {
               Contact
             </Link>
 
+            {/* User Menu */}
             {isLoggedIn ? (
-              <>
-                <Link to="/buy" className="text-gray-300 hover:text-white transition-colors">
-                  Browse Books
-                </Link>
-                <Link 
-                  to="/sell"
-                  className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-                >
-                  Sell Books
-                </Link>
-                
-                {/* User Menu with Hover */}
-                <div className="relative group">
-                  <div className="flex items-center space-x-2 text-gray-300 hover:text-white cursor-pointer">
-                    <FaUserCircle className="text-2xl" />
-                    <span>{username}</span>
-                  </div>
-                  {/* Logout on Hover */}
-                  <div className="absolute right-0 mt-1 py-2 w-32 bg-white rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
-                    <button
-                      onClick={handleLogout}
-                      className="w-full text-left px-4 py-2 text-gray-700 hover:bg-red-50 hover:text-red-500 transition-colors"
-                    >
-                      Logout
-                    </button>
-                  </div>
-                </div>
-              </>
-            ) : (
-              // Combined Login/Register Button with Hover
               <div className="relative group">
-                <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2">
-                  <FaUserCircle className="text-xl" />
-                  <span>Join Now!</span>
-                </button>
-                <div className="absolute right-0 mt-1 py-2 w-32 bg-white rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
-                  <Link
-                    to="/login"
-                    className="block px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"
+                <div className="flex items-center space-x-2 text-gray-300 hover:text-white cursor-pointer">
+                  <FaUserCircle className="text-2xl" />
+                  <span>{username || localStorage.getItem("username") || "Guest"}</span>
+                </div>
+                <div className="absolute justify-center mt-1 py-2 w-32 bg-white rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+                  <button
+                    onClick={handleLogout}
+                    className="w-full text-center p-1 text-gray-700 hover:bg-red-50 hover:text-red-500 transition-colors"
                   >
-                    Login
-                  </Link>
+                    Logout
+                  </button>
                 </div>
               </div>
+            ) : (
+              <button
+                onClick={() => navigate("/login")}
+                className="px-4 py-2 text-cyan-500font-semibold text-white bg-blue-500 rounded-md hover:bg-blue-600 transition"
+              >
+                Start Selling
+              </button>
             )}
           </div>
-
-          {/* Mobile menu button */}
-          <button
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="md:hidden text-gray-300 hover:text-white"
-          >
-            {isMenuOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
-          </button>
         </div>
+
+        {/* Mobile menu button */}
+        <button
+          onClick={() => setIsMenuOpen(!isMenuOpen)}
+          className="md:hidden text-gray-300 hover:text-white"
+        >
+          {isMenuOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
+        </button>
       </div>
 
       {/* Mobile menu */}
@@ -134,45 +124,19 @@ const NavBar = () => {
             </Link>
 
             {isLoggedIn ? (
-              <>
-                <Link
-                  to="/buy"
-                  className="block px-3 py-2 text-gray-300 hover:text-white"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  Browse Books
-                </Link>
-                <Link
-                  to="/sell"
-                  className="block px-3 py-2 text-gray-300 hover:text-white"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  Sell Books
-                </Link>
-                <button
-                  onClick={handleLogout}
-                  className="block w-full text-left px-3 py-2 text-red-400 hover:text-red-300"
-                >
-                  Logout ({username})
-                </button>
-              </>
+              <button
+                onClick={handleLogout}
+                className="block w-full text-left px-3 py-2 text-red-400 hover:text-red-300"
+              >
+                Logout
+              </button>
             ) : (
-              <>
-                <Link
-                  to="/login"
-                  className="block px-3 py-2 text-gray-300 hover:text-white"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  Login
-                </Link>
-                <Link
-                  to="/register"
-                  className="block px-3 py-2 text-gray-300 hover:text-white"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  Register
-                </Link>
-              </>
+              <button
+                onClick={() => navigate("/login")}
+                className="block w-full text-left px-3 py-2 text-green-400 hover:text-green-300"
+              >
+                Start Selling
+              </button>
             )}
           </div>
         </div>
