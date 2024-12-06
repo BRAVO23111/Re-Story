@@ -4,6 +4,21 @@ import { toast } from "react-hot-toast";
 import { FaBook, FaBars, FaTimes, FaUserCircle } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { login, logout } from "../store/slices/authSlice";
+import { Button } from "@mui/material";
+import { styled } from "@mui/material/styles";
+
+// Styled Material UI Button
+const StyledButton = styled(Button)(({ theme }) => ({
+  background: 'linear-gradient(to right, #3b82f6, #2563eb)',
+  color: 'white',
+  padding: '8px 16px',
+  borderRadius: '8px',
+  textTransform: 'none',
+  fontWeight: '500',
+  '&:hover': {
+    background: 'linear-gradient(to right, #2563eb, #1d4ed8)',
+  },
+}));
 
 const NavBar = () => {
   const navigate = useNavigate();
@@ -47,18 +62,12 @@ const NavBar = () => {
             <Link to="/" className="text-gray-300 hover:text-white transition-colors">
               Home
             </Link>
-            {isLoggedIn && ( // Show Browse and Sell links if logged in
+            {isLoggedIn && (
               <>
-                <Link 
-                  to="/buy" 
-                  className="text-gray-300 hover:text-white transition-colors"
-                >
+                <Link to="/buy" className="text-gray-300 hover:text-white transition-colors">
                   Browse
                 </Link>
-                <Link 
-                  to="/sell" 
-                  className="text-gray-300 hover:text-white transition-colors"
-                >
+                <Link to="/sell" className="text-gray-300 hover:text-white transition-colors">
                   Sell
                 </Link>
               </>
@@ -72,29 +81,28 @@ const NavBar = () => {
 
             {/* User Menu */}
             <div className="relative group">
-              <div className="flex items-center space-x-2 text-gray-300 hover:text-white cursor-pointer">
-                <FaUserCircle className="text-2xl" />
-                <span>{username || "Guest"}</span>
-              </div>
-              {/* Logout or Login on Hover */}
               {isLoggedIn ? (
-                <div className="absolute right-0 mt-1 py-2 w-32 bg-white rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
-                  <button
-                    onClick={handleLogout}
-                    className="w-full text-left px-4 py-2 text-gray-700 hover:bg-red-50 hover:text-red-500 transition-colors"
-                  >
-                    Logout
-                  </button>
+                <div className="flex items-center space-x-2">
+                  <div className="flex items-center space-x-2 text-gray-300 hover:text-white cursor-pointer">
+                    <FaUserCircle className="text-2xl" />
+                    <span>{username}</span>
+                  </div>
+                  <div className="absolute right-0 mt-8 py-2 w-32 bg-white rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+                    <button
+                      onClick={handleLogout}
+                      className="w-full text-left px-4 py-2 text-gray-700 hover:bg-red-50 hover:text-red-500 transition-colors"
+                    >
+                      Logout
+                    </button>
+                  </div>
                 </div>
               ) : (
-                <div className="absolute right-0 mt-1 py-2 w-32 bg-white rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
-                  <button
-                    onClick={() => navigate('/login')}
-                    className="w-full text-left px-4 py-2 text-gray-700 hover:bg-green-50 hover:text-green-500 transition-colors"
-                  >
-                    Login
-                  </button>
-                </div>
+                <StyledButton
+                  onClick={() => navigate('/login')}
+                  className="shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200"
+                >
+                  Start Selling
+                </StyledButton>
               )}
             </div>
           </div>
@@ -120,7 +128,7 @@ const NavBar = () => {
             >
               Home
             </Link>
-            {isLoggedIn && ( // Show Browse and Sell links if logged in
+            {isLoggedIn && (
               <>
                 <Link
                   to="/buy"
@@ -155,21 +163,25 @@ const NavBar = () => {
 
             {isLoggedIn ? (
               <button
-                onClick={handleLogout}
+                onClick={() => {
+                  handleLogout();
+                  setIsMenuOpen(false);
+                }}
                 className="block w-full text-left px-3 py-2 text-red-400 hover:text-red-300"
               >
                 Logout
               </button>
             ) : (
-              <button
+              <StyledButton
                 onClick={() => {
                   navigate('/login');
                   setIsMenuOpen(false);
                 }}
-                className="block w-full text-left px-3 py-2 text-green-400 hover:text-green-300"
+                fullWidth
+                className="mt-2"
               >
-                Login
-              </button>
+                Start Selling
+              </StyledButton>
             )}
           </div>
         </div>
