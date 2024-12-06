@@ -8,21 +8,35 @@ import { BooksSellingRoutes } from "./routes/BooksSellingRoutes.js";
 dotenv.config();
 const app = express();
 
-const developmentOrigin = 'http://localhost:5173';
-const productionOrigin = 'https://re-story1.vercel.app';
+// Define allowed origins
+const allowedOrigins = [
+    'https://re-story1.vercel.app',
+    'http://localhost:5173',
+    'http://localhost:3000'
+];
 
-// CORS Configuration
+// CORS configuration
 app.use(cors({
-    origin: process.env.NODE_ENV === 'production' ? productionOrigin : developmentOrigin,
+    origin: function (origin, callback) {
+        // Allow requests with no origin (like mobile apps or curl requests)
+        if (!origin) return callback(null, true);
+        
+        if (allowedOrigins.indexOf(origin) !== -1) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
+    allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 
 // Handle preflight requests
 app.options('*', cors());
 
 app.use(express.json());
-// app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true }));
 
 // Connect to MongoDB
 try {
