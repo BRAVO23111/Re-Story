@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
-import { FaBook, FaBars, FaTimes, FaUserCircle } from "react-icons/fa";
+import { FaBook, FaBars, FaTimes, FaUserCircle, FaHome, FaSearch, FaStore, FaInfoCircle, FaEnvelope } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { login, logout } from "../store/slices/authSlice";
 import { Button } from "@mui/material";
@@ -51,35 +51,44 @@ const NavBar = () => {
     <nav className="bg-gray-900 fixed w-full z-50 shadow-lg">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2">
-            <FaBook className="text-blue-500 text-2xl" />
-            <span className="text-white text-xl font-bold">ReStory</span>
-          </Link>
+          {/* Left Section: Logo */}
+          <div className="flex-shrink-0">
+            <Link to="/" className="flex items-center space-x-2">
+              <FaBook className="text-blue-500 text-2xl" />
+              <span className="text-white text-xl font-bold">ReStory</span>
+            </Link>
+          </div>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
-            <Link to="/" className="text-gray-300 hover:text-white transition-colors">
-              Home
+          {/* Navigation Links - Spread across with equal spacing */}
+          <div className="hidden md:flex flex-1 items-center justify-evenly px-16">
+            <Link to="/" className="text-gray-300 hover:text-white transition-colors flex items-center space-x-1">
+              <FaHome className="text-lg" />
+              <span>Home</span>
             </Link>
             {isLoggedIn && (
               <>
-                <Link to="/buy" className="text-gray-300 hover:text-white transition-colors">
-                  Browse
+                <Link to="/buy" className="text-gray-300 hover:text-white transition-colors flex items-center space-x-1">
+                  <FaSearch className="text-lg" />
+                  <span>Browse</span>
                 </Link>
-                <Link to="/sell" className="text-gray-300 hover:text-white transition-colors">
-                  Sell
+                <Link to="/sell" className="text-gray-300 hover:text-white transition-colors flex items-center space-x-1">
+                  <FaStore className="text-lg" />
+                  <span>Sell</span>
                 </Link>
               </>
             )}
-            <Link to="/about" className="text-gray-300 hover:text-white transition-colors">
-              About
+            <Link to="/about" className="text-gray-300 hover:text-white transition-colors flex items-center space-x-1">
+              <FaInfoCircle className="text-lg" />
+              <span>About</span>
             </Link>
-            <Link to="/contact" className="text-gray-300 hover:text-white transition-colors">
-              Contact
+            <Link to="/contact" className="text-gray-300 hover:text-white transition-colors flex items-center space-x-1">
+              <FaEnvelope className="text-lg" />
+              <span>Contact</span>
             </Link>
+          </div>
 
-            {/* User Menu */}
+          {/* Right Section: User Menu */}
+          <div className="flex items-center space-x-4">
             <div className="relative group">
               {isLoggedIn ? (
                 <div className="flex items-center space-x-2">
@@ -105,15 +114,15 @@ const NavBar = () => {
                 </StyledButton>
               )}
             </div>
-          </div>
 
-          {/* Mobile menu button */}
-          <button
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="md:hidden text-gray-300 hover:text-white"
-          >
-            {isMenuOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
-          </button>
+            {/* Mobile menu button */}
+            <button
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="md:hidden text-gray-300 hover:text-white"
+            >
+              {isMenuOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
+            </button>
+          </div>
         </div>
       </div>
 
