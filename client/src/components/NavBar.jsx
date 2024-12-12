@@ -59,8 +59,8 @@ const NavBar = () => {
             </Link>
           </div>
 
-          {/* Navigation Links - Spread across with equal spacing */}
-          <div className="hidden md:flex flex-1 items-center justify-evenly px-16">
+          {/* Navigation Links - Closer spacing */}
+          <div className="hidden md:flex flex-1 items-center justify-center space-x-8 px-4">
             <Link to="/" className="text-gray-300 hover:text-white transition-colors flex items-center space-x-1">
               <FaHome className="text-lg" />
               <span>Home</span>
