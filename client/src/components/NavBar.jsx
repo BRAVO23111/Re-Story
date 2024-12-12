@@ -48,7 +48,7 @@ const NavBar = () => {
   };
 
   return (
-    <nav className="bg-gray-900 fixed w-full z-50 shadow-lg">
+    <nav className="bg-gray-900 bg-opacity-80 backdrop-blur-md fixed w-full z-50 shadow-lg">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Left Section: Logo */}
@@ -59,31 +59,31 @@ const NavBar = () => {
             </Link>
           </div>
 
-          {/* Navigation Links - Closer spacing */}
-          <div className="hidden md:flex flex-1 items-center justify-center space-x-8 px-4">
-            <Link to="/" className="text-gray-300 hover:text-white transition-colors flex items-center space-x-1">
+          {/* Navigation Links - Modern look */}
+          <div className="hidden md:flex flex-1 items-center justify-center space-x-6">
+            <Link to="/" className="text-gray-300 hover:text-white transition-colors duration-300 flex items-center space-x-1">
               <FaHome className="text-lg" />
-              <span>Home</span>
+              <span className="font-medium">Home</span>
             </Link>
             {isLoggedIn && (
               <>
-                <Link to="/buy" className="text-gray-300 hover:text-white transition-colors flex items-center space-x-1">
+                <Link to="/buy" className="text-gray-300 hover:text-white transition-colors duration-300 flex items-center space-x-1">
                   <FaSearch className="text-lg" />
-                  <span>Browse</span>
+                  <span className="font-medium">Browse</span>
                 </Link>
-                <Link to="/sell" className="text-gray-300 hover:text-white transition-colors flex items-center space-x-1">
+                <Link to="/sell" className="text-gray-300 hover:text-white transition-colors duration-300 flex items-center space-x-1">
                   <FaStore className="text-lg" />
-                  <span>Sell</span>
+                  <span className="font-medium">Sell</span>
                 </Link>
               </>
             )}
-            <Link to="/about" className="text-gray-300 hover:text-white transition-colors flex items-center space-x-1">
+            <Link to="/about" className="text-gray-300 hover:text-white transition-colors duration-300 flex items-center space-x-1">
               <FaInfoCircle className="text-lg" />
-              <span>About</span>
+              <span className="font-medium">About</span>
             </Link>
-            <Link to="/contact" className="text-gray-300 hover:text-white transition-colors flex items-center space-x-1">
+            <Link to="/contact" className="text-gray-300 hover:text-white transition-colors duration-300 flex items-center space-x-1">
               <FaEnvelope className="text-lg" />
-              <span>Contact</span>
+              <span className="font-medium">Contact</span>
             </Link>
           </div>
 
