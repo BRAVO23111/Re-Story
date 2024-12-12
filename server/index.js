@@ -5,26 +5,63 @@ import cors from 'cors';
 import { UserRouter } from "./routes/UserRoutes.js";
 import { BooksSellingRoutes } from "./routes/BooksSellingRoutes.js";
 
-
 dotenv.config();
 const app = express();
-app.use(cors())
+
+// Define allowed origins
+const allowedOrigins = [
+    'https://re-story1.vercel.app',
+    'http://localhost:5173',
+    'http://localhost:3000'
+];
+
+// CORS configuration
+app.use(cors({
+    origin: function (origin, callback) {
+        // Allow requests with no origin (like mobile apps or curl requests)
+        if (!origin) return callback(null, true);
+        
+        if (allowedOrigins.indexOf(origin) !== -1) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    credentials: true,
+    allowedHeaders: ['Content-Type', 'Authorization'],
+}));
+
+// Handle preflight requests
+app.options('*', cors());
+
 app.use(express.json());
-const db = mongoose.connect("mongodb+srv://test:test@cluster0.u14fq.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
+app.use(express.urlencoded({ extended: true }));
+
+// Connect to MongoDB
 try {
-    if(db){
-        console.log("database connected");
-    }
+    await mongoose.connect(process.env.MONGO_URI);
+    console.log("Database connected successfully");
 } catch (error) {
-    console.log(error);
+    console.log("Database connection error:", error);
 }
 
-app.use("/api/auth" , UserRouter);
-app.use("/api/books" , BooksSellingRoutes);
-app.get('/' ,(req,res)=>{
-    res.send("Hello World");
-})
+// Global error handler for CORS
+app.use((err, req, res, next) => {
+    if (err.message === 'Not allowed by CORS') {
+        res.status(403).json({
+            message: 'CORS not allowed for this origin'
+        });
+    } else {
+        next(err);
+    }
+});
 
-app.listen(3000 , (req,res)=>{
-    console.log("Server is running on port 3000");
-})
+// Routes
+app.use("/api/auth", UserRouter);
+app.use("/api/books", BooksSellingRoutes);
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+});
