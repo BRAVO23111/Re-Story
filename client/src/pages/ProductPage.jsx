@@ -4,6 +4,7 @@ const ProductPage = () => {
   return (
     <div>
       Product Info
+      contains info
     </div>
   )
 }
