@@ -1,10 +1,13 @@
 import express from 'express';
-import { addBookForSale, getBooksAvailableToBuy } from '../controller/SellingController.js';
+import { addBookForSale, getBooksAvailableToBuy, getBookById } from '../controller/SellingController.js';
 
 const router = express.Router();
 
+// Specific routes first
 router.get("/sale", getBooksAvailableToBuy);  
 router.post("/sell", addBookForSale); 
-// router.post("/buy", addBookToBuy); 
+
+// Parameterized routes last
+router.get("/:id", getBookById);  
 
 export {router as BooksSellingRoutes};
