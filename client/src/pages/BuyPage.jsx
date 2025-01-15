@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Box,
   Container,
@@ -71,6 +72,8 @@ const BuyPage = () => {
   const [priceRange, setPriceRange] = useState([0, 1000]);
   const [sortBy, setSortBy] = useState("newest");
   const [yearRange, setYearRange] = useState([1900, new Date().getFullYear()]);
+
+  const navigate = useNavigate();
 
   const genres = ["All", "Fiction", "Non-Fiction", "Mystery", "Science Fiction", "Romance", "Biography"];
 
@@ -364,8 +367,8 @@ const BuyPage = () => {
                             },
                           }}
                           onClick={() => {
-                            // Add your details view logic here
-                            toast.success(`Viewing details for ${book.title}`);
+                            // Navigate to product details page
+                            navigate(`/product/${book._id}`);
                           }}
                         >
                           Details
