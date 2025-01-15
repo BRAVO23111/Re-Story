@@ -25,6 +25,10 @@ const bookSchema = mongoose.Schema({
         type: String,
         required: false,
     },
+    description: {
+        type: String,
+        required: false,
+    },
     transactionType: {
         type: String,
         enum: ['buy', 'sell'], // Specifies whether the book is listed for buying or selling
@@ -34,14 +38,14 @@ const bookSchema = mongoose.Schema({
         type: String, // Store additional info about the seller (e.g., contact details)
         required: false,
     },
-    condition :{
-        type : String, // Store additional info about the
-        enum : ['New', 'Like new', 'Good', 'Acceptable', 'Damaged'], // Condition of the book
+    condition: {
+        type: String,
+        enum: ['New', 'Like new', 'Good', 'Acceptable', 'Damaged'],
         required: true,
     },
     sold: {
-        type: Boolean, // Indicates whether the book is sold
-        default: false, // Defaults to not sold
+        type: Boolean,
+        default: false,
         required: true,
     },
 });

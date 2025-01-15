@@ -4,7 +4,6 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import { UserRouter } from "./routes/UserRoutes.js";
 import { BooksSellingRoutes } from "./routes/BooksSellingRoutes.js";
-import bookRoutes from "./routes/bookRoutes.js";
 
 dotenv.config();
 const app = express();
@@ -61,7 +60,6 @@ app.use((err, req, res, next) => {
 // Routes
 app.use("/api/auth", UserRouter);
 app.use("/api/books", BooksSellingRoutes);
-app.use('/api/books', bookRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

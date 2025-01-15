@@ -18,6 +18,7 @@ import {
 import { styled } from "@mui/material/styles";
 import api from '../config/config';
 import { toast } from "react-hot-toast";
+import ProductPage from "./ProductPage";
 
 // Animation variants
 const fadeIn = {
@@ -368,8 +369,7 @@ const BuyPage = () => {
                           }}
                           onClick={() => {
                             // Navigate to product details page
-                            navigate(`/product/${book._id}`);
-                          }}
+                            navigate(`/product/${book._id}`);                        }}
                         >
                           Details
                         </Button>

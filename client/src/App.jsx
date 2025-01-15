@@ -8,6 +8,7 @@ import AboutUsPage from "./pages/AboutUsPage";
 import ContactUsPage from "./pages/ContactUsPage";
 import BuyPage from "./pages/BuyPage";
 import SellPage from "./pages/SellPage";
+import ProductPage from "./pages/ProductPage";
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
         <Route path="/contact" element={<ContactUsPage />} />
         <Route path ="/buy" element={<BuyPage />} />
         <Route path ="/sell" element={<SellPage />} />
+        <Route path="/product/:id" element={<ProductPage />} />  
       </Routes>
       <Footer />
     </>
