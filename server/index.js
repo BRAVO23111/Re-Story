@@ -1,11 +1,20 @@
+import dotenv from 'dotenv';
+// Load environment variables first
+dotenv.config();
+
+// Check for required environment variables
+if (!process.env.STRIPE_SECRET_KEY || !process.env.MONGO_URI) {
+    console.error('Missing required environment variables');
+    process.exit(1);
+}
+
 import mongoose from "mongoose";
 import express from "express";
-import dotenv from 'dotenv';
 import cors from 'cors';
 import { UserRouter } from "./routes/UserRoutes.js";
 import { BooksSellingRoutes } from "./routes/BooksSellingRoutes.js";
+import { PaymentRoutes } from "./routes/PaymentRoutes.js";
 
-dotenv.config();
 const app = express();
 
 // Define allowed origins
@@ -85,6 +94,7 @@ app.use((err, req, res, next) => {
 // Routes
 app.use("/api/auth", UserRouter);
 app.use("/api/books", BooksSellingRoutes);
+app.use("/api/payments" , PaymentRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
