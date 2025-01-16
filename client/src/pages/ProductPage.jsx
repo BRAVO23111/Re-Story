@@ -6,6 +6,7 @@ import { styled } from '@mui/material/styles';
 import api from '../config/config';
 import { toast } from 'react-hot-toast';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import { loadStripe } from '@stripe/stripe-js';
 
 // Animation variants
 const fadeIn = {
@@ -47,6 +48,8 @@ const StyledButton = styled(Button)(({ theme }) => ({
     boxShadow: '0 6px 10px 2px rgba(59, 130, 246, .3)',
   },
 }));
+
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
 
 const ProductPage = () => {
   const { id } = useParams();
@@ -196,13 +199,38 @@ const ProductPage = () => {
                       <StyledButton
                         fullWidth
                         startIcon={<ShoppingCartIcon />}
-                        onClick={() => {
-                          // Open email client with seller's details
-                          if (book.sellerDetails) {
-                            window.location.href = `mailto:${book.sellerDetails}?subject=Interested in buying: ${book.title}&body=Hi, I am interested in buying the book "${book.title}" listed for $${book.price}.`;
-                            toast.success('Opening email client...');
-                          } else {
-                            toast.error('Seller contact details not available');
+                        onClick={async () => {
+                          try {
+                            const stripe = await stripePromise;
+                            if (!stripe) {
+                              toast.error('Stripe failed to load');
+                              return;
+                            }
+
+                            // Create a payment intent
+                            const response = await api.post('/api/payment/create-payment-intent', {
+                              amount: book.price,
+                              currency: 'inr'
+                            });
+
+                            if (!response.data.success) {
+                              throw new Error('Failed to create payment');
+                            }
+
+                            // Redirect to Stripe checkout
+                            const result = await stripe.redirectToCheckout({
+                              clientSecret: response.data.clientSecret,
+                              mode: 'payment',
+                              successUrl: `${window.location.origin}/success`,
+                              cancelUrl: `${window.location.origin}/cancel`,
+                            });
+
+                            if (result.error) {
+                              toast.error(result.error.message);
+                            }
+                          } catch (error) {
+                            console.error('Payment error:', error);
+                            toast.error(error.message || 'Payment failed');
                           }
                         }}
                         sx={{ mb: 3 }}
