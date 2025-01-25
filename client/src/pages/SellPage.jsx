@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-hot-toast";
 import {
@@ -63,6 +64,7 @@ const StyledTextField = styled(TextField)(({ theme }) => ({
 }));
 
 const SellPage = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     title: "",
     author: "",
@@ -74,28 +76,108 @@ const SellPage = () => {
     condition: "Good", // Default condition
   });
 
+  const [imageError, setImageError] = useState(false);
+  const [imagePreview, setImagePreview] = useState(null);
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const validateImageUrl = async (url) => {
+    try {
+      const img = new Image();
+      img.src = url;
+      return new Promise((resolve) => {
+        img.onload = () => resolve(true);
+        img.onerror = () => resolve(false);
+      });
+    } catch {
+      return false;
+    }
+  };
+
+  const handleImageUrlChange = async (e) => {
+    const url = e.target.value;
+    setFormData({ ...formData, imageURL: url });
+    
+    if (url) {
+      const isValid = await validateImageUrl(url);
+      setImageError(!isValid);
+      setImagePreview(isValid ? url : null);
+    } else {
+      setImageError(false);
+      setImagePreview(null);
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await api.post('/api/books/sell', formData);
-      toast.success('Book listed for sale successfully!');
-      setFormData({
-        title: "",
-        author: "",
-        publicationYear: "",
-        genre: "",
-        price: "",
-        imageURL: "",
-        description: "",
-        condition: "Good",
-      });
+      // Format the data before sending
+      const formattedData = {
+        ...formData,
+        publicationYear: parseInt(formData.publicationYear),
+        price: parseFloat(formData.price),
+        condition: formData.condition || "Good",
+        description: formData.description || `${formData.title} by ${formData.author}`
+      };
+
+      // If image URL is provided but invalid, show error
+      if (formData.imageURL && imageError) {
+        toast.error('Please provide a valid image URL');
+        return;
+      }
+
+      // Set default image URL if none provided
+      if (!formData.imageURL) {
+        formattedData.imageURL = "https://via.placeholder.com/200x300?text=Book+Cover";
+      }
+
+      // Validate required fields
+      if (!formattedData.title || !formattedData.author || !formattedData.publicationYear || 
+          !formattedData.genre || !formattedData.price) {
+        toast.error('Please fill in all required fields');
+        return;
+      }
+
+      // Validate numeric fields
+      if (isNaN(formattedData.price) || formattedData.price <= 0) {
+        toast.error('Please enter a valid price');
+        return;
+      }
+
+      if (isNaN(formattedData.publicationYear) || 
+          formattedData.publicationYear < 1800 || 
+          formattedData.publicationYear > new Date().getFullYear()) {
+        toast.error('Please enter a valid publication year');
+        return;
+      }
+
+      const response = await api.post('/api/books/sell', formattedData);
+      
+      if (response.data) {
+        toast.success('Book listed for sale successfully!');
+        // Reset form
+        setFormData({
+          title: "",
+          author: "",
+          publicationYear: "",
+          genre: "",
+          price: "",
+          imageURL: "",
+          description: "",
+          condition: "Good",
+        });
+        setImagePreview(null);
+        
+        // Redirect to browse page after a short delay
+        setTimeout(() => {
+          navigate('/buy');
+        }, 1000); // 1 second delay to show the success message
+      }
     } catch (error) {
       console.error('Error listing book:', error);
-      toast.error('Failed to list book for sale');
+      toast.error(error.response?.data?.message || 'Failed to list book for sale');
     }
   };
 
@@ -306,11 +388,65 @@ const SellPage = () => {
                               label="Image URL"
                               name="imageURL"
                               value={formData.imageURL}
-                              onChange={handleChange}
+                              onChange={handleImageUrlChange}
                               placeholder="https://example.com/book-image.jpg"
                             />
                           </motion.div>
                         </Grid>
+
+                        {formData.imageURL && (
+                          <Grid item xs={12}>
+                            <motion.div variants={fadeIn}>
+                              <Box
+                                sx={{
+                                  mt: 2,
+                                  p: 2,
+                                  border: '1px solid rgba(255, 255, 255, 0.23)',
+                                  borderRadius: 1,
+                                  textAlign: 'center',
+                                  display: 'flex',
+                                  flexDirection: 'column',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  minHeight: '300px'
+                                }}
+                              >
+                                <Typography
+                                  variant="body2"
+                                  sx={{
+                                    color: imageError ? 'error.main' : 'success.main',
+                                    mb: 2
+                                  }}
+                                >
+                                  {imageError ? 'Invalid image URL' : 'Image Preview'}
+                                </Typography>
+                                {imagePreview && (
+                                  <Box
+                                    sx={{
+                                      width: '100%',
+                                      height: '300px',
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      justifyContent: 'center',
+                                      overflow: 'hidden'
+                                    }}
+                                  >
+                                    <img
+                                      src={imagePreview}
+                                      alt="Book preview"
+                                      style={{
+                                        maxWidth: '100%',
+                                        maxHeight: '100%',
+                                        objectFit: 'contain',
+                                        borderRadius: '4px'
+                                      }}
+                                    />
+                                  </Box>
+                                )}
+                              </Box>
+                            </motion.div>
+                          </Grid>
+                        )}
 
                         {/* Description */}
                         <Grid item xs={12}>
