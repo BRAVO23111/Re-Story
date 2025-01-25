@@ -49,6 +49,10 @@ const StyledButton = styled(Button)(({ theme }) => ({
   },
 }));
 
+// Debug environment variables
+console.log('All env vars:', import.meta.env);
+console.log('Stripe Key:', import.meta.env.VITE_STRIPE_PUBLIC_KEY);
+
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
 
 const ProductPage = () => {
@@ -208,9 +212,10 @@ const ProductPage = () => {
                             }
 
                             // Create a payment intent
-                            const response = await api.post('/api/payment/create-payment-intent', {
+                            const response = await api.post('/api/payments/create-payment-intent', {
                               amount: book.price,
-                              currency: 'inr'
+                              currency: 'inr',
+                              productId: id
                             });
 
                             if (!response.data.success) {
@@ -219,10 +224,7 @@ const ProductPage = () => {
 
                             // Redirect to Stripe checkout
                             const result = await stripe.redirectToCheckout({
-                              clientSecret: response.data.clientSecret,
-                              mode: 'payment',
-                              successUrl: `${window.location.origin}/success`,
-                              cancelUrl: `${window.location.origin}/cancel`,
+                              sessionId: response.data.sessionId
                             });
 
                             if (result.error) {
