@@ -1,12 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { motion } from "framer-motion";
-import { Box, Container, Grid, Typography, Paper, Chip, Button } from '@mui/material';
+import { Box, Container, Grid, Typography, Paper, Chip, Button, Stack } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import api from '../config/config';
 import { toast } from 'react-hot-toast';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import PaymentIcon from '@mui/icons-material/Payment';
 import { loadStripe } from '@stripe/stripe-js';
+import { useDispatch } from 'react-redux';
+import { addCart } from '../store/slices/cartSlice';
 
 // Animation variants
 const fadeIn = {
@@ -57,6 +60,7 @@ const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
 
 const ProductPage = () => {
   const { id } = useParams();
+  const dispatch = useDispatch();
   const [book, setBook] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -200,45 +204,70 @@ const ProductPage = () => {
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.5 }}
                     >
-                      <StyledButton
-                        fullWidth
-                        startIcon={<ShoppingCartIcon />}
-                        onClick={async () => {
-                          try {
-                            const stripe = await stripePromise;
-                            if (!stripe) {
-                              toast.error('Stripe failed to load');
-                              return;
+                      <Stack direction="row" spacing={2} sx={{ mb: 3 }}>
+                        <StyledButton
+                          fullWidth
+                          startIcon={<ShoppingCartIcon />}
+                          onClick={() => {
+                            dispatch(addCart({
+                              id: book._id,
+                              title: book.title,
+                              author: book.author,
+                              price: book.price,
+                              imageURL: book.imageURL || '/default-book-cover.jpg'
+                            }));
+                            toast.success('Added to cart!');
+                          }}
+                          sx={{ 
+                            background: 'linear-gradient(45deg, #10b981 30%, #34d399 90%)',
+                            boxShadow: '0 3px 5px 2px rgba(16, 185, 129, .3)',
+                            '&:hover': {
+                              background: 'linear-gradient(45deg, #059669 30%, #10b981 90%)',
+                              boxShadow: '0 6px 10px 2px rgba(16, 185, 129, .3)',
                             }
+                          }}
+                        >
+                          Add to Cart
+                        </StyledButton>
+                        <StyledButton
+                          fullWidth
+                          startIcon={<PaymentIcon />}
+                          onClick={async () => {
+                            try {
+                              const stripe = await stripePromise;
+                              if (!stripe) {
+                                toast.error('Stripe failed to load');
+                                return;
+                              }
 
-                            // Create a payment intent
-                            const response = await api.post('/api/payments/create-payment-intent', {
-                              amount: book.price,
-                              currency: 'inr',
-                              productId: id
-                            });
+                              // Create a payment intent
+                              const response = await api.post('/api/payments/create-payment-intent', {
+                                amount: book.price,
+                                currency: 'inr',
+                                productId: id
+                              });
 
-                            if (!response.data.success) {
-                              throw new Error('Failed to create payment');
+                              if (!response.data.success) {
+                                throw new Error('Failed to create payment');
+                              }
+
+                              // Redirect to Stripe checkout
+                              const result = await stripe.redirectToCheckout({
+                                sessionId: response.data.sessionId
+                              });
+
+                              if (result.error) {
+                                toast.error(result.error.message);
+                              }
+                            } catch (error) {
+                              console.error('Payment error:', error);
+                              toast.error(error.message || 'Payment failed');
                             }
-
-                            // Redirect to Stripe checkout
-                            const result = await stripe.redirectToCheckout({
-                              sessionId: response.data.sessionId
-                            });
-
-                            if (result.error) {
-                              toast.error(result.error.message);
-                            }
-                          } catch (error) {
-                            console.error('Payment error:', error);
-                            toast.error(error.message || 'Payment failed');
-                          }
-                        }}
-                        sx={{ mb: 3 }}
-                      >
-                        Buy Now
-                      </StyledButton>
+                          }}
+                        >
+                          Buy Now
+                        </StyledButton>
+                      </Stack>
                     </motion.div>
                   )}
                   {book.description && (

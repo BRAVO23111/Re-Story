@@ -1,14 +1,14 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
-import { FaBook, FaBars, FaTimes, FaUserCircle, FaHome, FaSearch, FaStore, FaInfoCircle, FaEnvelope } from "react-icons/fa";
+import { FaBook, FaBars, FaTimes, FaUserCircle, FaHome, FaSearch, FaStore, FaInfoCircle, FaEnvelope, FaShoppingCart } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { login, logout } from "../store/slices/authSlice";
-import { Button } from "@mui/material";
+import { Button, Badge } from "@mui/material";
 import { styled } from "@mui/material/styles";
 
 // Styled Material UI Button
-const StyledButton = styled(Button)(({ theme }) => ({
+const StyledButton = styled(Button)(() => ({
   background: 'linear-gradient(to right, #3b82f6, #2563eb)',
   color: 'white',
   padding: '8px 16px',
@@ -26,6 +26,7 @@ const NavBar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   
   const { isLoggedIn, username } = useSelector((state) => state.auth);
+  const { cartItems } = useSelector((state) => state.cart);
 
   useEffect(() => {
     const token = window.localStorage.getItem("token");
@@ -87,8 +88,23 @@ const NavBar = () => {
             </Link>
           </div>
 
-          {/* Right Section: User Menu */}
+          {/* Right Section: Cart and User Menu */}
           <div className="flex items-center space-x-4">
+            <Link to="/cart" className="text-gray-300 hover:text-white transition-colors duration-300 relative">
+              <Badge 
+                badgeContent={cartItems.length} 
+                color="error" 
+                sx={{ 
+                  '& .MuiBadge-badge': { 
+                    fontSize: '0.7rem', 
+                    height: '18px', 
+                    minWidth: '18px' 
+                  } 
+                }}
+              >
+                <FaShoppingCart className="text-xl" />
+              </Badge>
+            </Link>
             <div className="relative group">
               {isLoggedIn ? (
                 <div className="flex items-center space-x-2">
@@ -152,6 +168,13 @@ const NavBar = () => {
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Sell
+                </Link>
+                <Link
+                  to="/cart"
+                  className="block px-3 py-2 text-gray-300 hover:text-white"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Cart ({cartItems.length})
                 </Link>
               </>
             )}
