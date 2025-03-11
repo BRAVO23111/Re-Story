@@ -172,8 +172,8 @@ const CartPage = () => {
           initial="initial"
           animate="animate"
         >
-          <Typography variant="h3" sx={{ color: "white", mb: 4, textAlign: "center" }}>
-            Your Shopping Cart
+          <Typography variant="h3" sx={{ color: "white", mb: 4, textAlign: "center" , mt : 4 }}>
+          📦 Items in Cart
           </Typography>
 
           {cartItems.length === 0 ? (

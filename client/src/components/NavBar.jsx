@@ -89,7 +89,7 @@ const NavBar = () => {
           </div>
 
           {/* Right Section: Cart and User Menu */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-6">
             <Link to="/cart" className="text-gray-300 hover:text-white transition-colors duration-300 relative">
               <Badge 
                 badgeContent={cartItems.length} 
