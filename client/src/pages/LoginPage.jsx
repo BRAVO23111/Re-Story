@@ -10,7 +10,6 @@ import {
   CardContent,
   IconButton,
   InputAdornment,
-  Divider,
   Alert,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
@@ -18,13 +17,14 @@ import {
   Mail as MailIcon,
   Lock as LockIcon,
   Visibility as VisibilityIcon,
-  VisibilityOff as VisibilityOffIcon,
-  Google as GoogleIcon,
-  Facebook as FacebookIcon 
+  VisibilityOff as VisibilityOffIcon 
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
-import axios from 'axios';
+
+import { useDispatch } from 'react-redux';
+import { login } from "../store/slices/authSlice";
+import api from "../config/config";
+
 const StyledCard = styled(Card)(({ theme }) => ({
   background: "rgba(31, 41, 55, 0.5)",
   backdropFilter: "blur(10px)",
@@ -67,30 +67,54 @@ const LoginPage = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const navigation = useNavigate();
+  const dispatch = useDispatch();
+
   const handleLogin = async(e) => {
     e.preventDefault();
-    // Add login logic here
     if (!email || !password) {
       setError("Please fill in all fields");
       return;
     }
     try {
-      const response = await axios.post("http://localhost:3000/api/auth/login",{
+      const response = await api.post("/api/auth/login", {
         email,
         password,
-      })
-      console.log("Logged in");
-      const token = response.data.token
-      window.localStorage.setItem("token" , token)
+      });
+      
+      const { token, userId, firstname } = response.data;
+      
+      window.localStorage.setItem("token", token);
+      window.localStorage.setItem("userId", userId);
+      window.localStorage.setItem("username", firstname);
+      
+      dispatch(login({ 
+        username: firstname,
+        token 
+      }));
+
+      try {
+        const profileResponse = await api.get(`/api/profile/${userId}`);
+        if (profileResponse.status === 404) {
+          navigation('/profile');
+        } else {
+          navigation('/buy');
+        }
+      } catch (error) {
+        if (error.response?.status === 404) {
+          navigation('/profile');
+        } else {
+          navigation('/buy');
+        }
+      }
     } catch (error) {
       console.error("Login failed:", error);
       setError(error.response?.data?.message || "Login failed");
     }
   };
 
-  const handlenavigation = ()=>{
-    navigation('/register')
-  }
+  const handlenavigation = () => {
+    navigation('/register');
+  };
 
   return (
     <Box
@@ -100,22 +124,7 @@ const LoginPage = () => {
         position: "relative",
       }}
     >
-      <Box
-        sx={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundImage: `url('/src/assets/pic1.jpeg')`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          opacity: 0.2,
-        }}
-      />
-      
       <NavBar />
-      
       <Container maxWidth="sm" sx={{ position: "relative", zIndex: 1, pt: 15 }}>
         <StyledCard>
           <CardContent sx={{ p: 4 }}>

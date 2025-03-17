@@ -1,5 +1,13 @@
 {
+  "name": "server",
+  "version": "1.0.0",
   "type": "module",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "prod": "NODE_ENV=production node index.js",
+    "dev:watch": "NODE_ENV=development nodemon index.js"
+  },
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
@@ -8,9 +16,14 @@
     "jsonwebtoken": "^9.0.2",
     "mongodb": "^6.11.0",
     "mongoose": "^8.8.2",
-    "nodemon": "^3.1.7"
+    "stripe": "^17.5.0"
   },
   "devDependencies": {
-    "dependency-cruiser": "^16.6.0"
+    "cross-env": "^7.0.3",
+    "dependency-cruiser": "^16.6.0",
+    "nodemon": "^3.1.7"
+  },
+  "engines": {
+    "node": ">=14.0.0"
   }
 }

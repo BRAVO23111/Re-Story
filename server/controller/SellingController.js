@@ -10,9 +10,22 @@ export const getBooksAvailableToBuy = async (req, res) => {
     }
 };
 
+// Get a single book by ID
+export const getBookById = async (req, res) => {
+    try {
+        const book = await Books.findById(req.params.id);
+        if (!book) {
+            return res.status(404).json({ message: "Book not found" });
+        }
+        res.status(200).json(book);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
 // Add a book for sale
 export const addBookForSale = async (req, res) => {
-    const { title, author, publicationYear, genre, price, imageURL } = req.body;
+    const { title, author, publicationYear, genre, price, imageURL, condition, description } = req.body;
 
     const newBook = new Books({
         title,
@@ -21,8 +34,10 @@ export const addBookForSale = async (req, res) => {
         genre,
         price,
         imageURL,
+        condition,
+        description,
         transactionType: "sell",
-        sold: false, // Default to unsold
+        sold: false,
     });
 
     try {

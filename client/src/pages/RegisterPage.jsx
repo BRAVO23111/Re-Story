@@ -10,7 +10,6 @@ import {
   CardContent,
   IconButton,
   InputAdornment,
-  Divider,
   Alert,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
@@ -19,13 +18,13 @@ import {
   Lock as LockIcon,
   Person as PersonIcon,
   Visibility as VisibilityIcon,
-  VisibilityOff as VisibilityOffIcon,
-  Google as GoogleIcon,
-  Facebook as FacebookIcon 
+  VisibilityOff as VisibilityOffIcon 
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
-import axios from 'axios'
+import { useDispatch } from "react-redux";
+import { login } from "../store/slices/authSlice";
+import api from '../config/config';
+
 const StyledCard = styled(Card)(({ theme }) => ({
   background: "rgba(31, 41, 55, 0.5)",
   backdropFilter: "blur(10px)",
@@ -64,7 +63,6 @@ const StyledButton = styled(Button)(({ theme }) => ({
 
 const RegisterPage = () => {
   const [showPassword, setShowPassword] = useState(false);
-  
   const [formData, setFormData] = useState({
     firstname: "",
     lastname: "",
@@ -73,6 +71,8 @@ const RegisterPage = () => {
   });
   const [error, setError] = useState("");
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -82,7 +82,7 @@ const RegisterPage = () => {
   };
 
   const validateForm = () => {
-    if (!formData.firstname || !formData.lastname || !formData.email || !formData.password || !formData.confirmPassword) {
+    if (!formData.firstname || !formData.lastname || !formData.email || !formData.password) {
       setError("Please fill in all fields");
       return false;
     }
@@ -92,43 +92,43 @@ const RegisterPage = () => {
       return false;
     }
 
-    if (formData.password.length < 8) {
+    if (formData.password.length < 4) {
       setError("Password must be at least 8 characters long");
-      return false;
-    }
-
-    if (formData.password !== formData.confirmPassword) {
-      setError("Passwords do not match");
       return false;
     }
 
     return true;
   };
 
-  const handleRegister = async(e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
-    const {firstname , lastname , email , password} = formData
-    if(!firstname || !lastname || !email || !password) {
-      alert("Please Fill all the required fields")
+    const { firstname, lastname, email, password } = formData;
+
+    if (!validateForm()) return;
+
+    try {
+      const response = await api.post("/api/auth/register", {
+        firstname,
+        lastname,
+        email,
+        password,
+      });
+
+      window.localStorage.setItem("username", firstname);
+      window.localStorage.setItem("registeredEmail", email);
+
+      navigate("/login");
+      alert("Registration successful! Please login to create your profile.");
+    } catch (error) {
+      console.error("Registration failed:", error);
+      setError(error.response?.data?.message || "Registration failed");
     }
-   try {
-    const response = await axios.post("http://localhost:3000/api/auth/register",{
-      firstname,
-      lastname,
-      email,
-      password,
-    });
-    navigate("/login")
-    alert("done")
-   } catch (error) {
-    console.error("Registration failed:", error);
-    setError(error.response?.data?.message || "Registration failed");
-   }
   };
 
-  const handlenavigation = () =>{
-    navigate('/login')
-  }
+  const handlenavigation = () => {
+    navigate('/login');
+  };
+
   return (
     <Box
       sx={{
@@ -137,22 +137,7 @@ const RegisterPage = () => {
         position: "relative",
       }}
     >
-      <Box
-        sx={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundImage: `url('/src/assets/pic1.jpeg')`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          opacity: 0.2,
-        }}
-      />
-      
       <NavBar />
-      
       <Container maxWidth="sm" sx={{ position: "relative", zIndex: 1, pt: 15, pb: 4 }}>
         <StyledCard>
           <CardContent sx={{ p: 4 }}>
@@ -256,6 +241,24 @@ const RegisterPage = () => {
                 }}
               />
 
+              {/* <StyledTextField
+                fullWidth
+                label="Confirm Password"
+                name="confirmPassword"
+                type={showPassword ? "text" : "password"}
+                variant="outlined"
+                margin="normal"
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <LockIcon />
+                    </InputAdornment>
+                  ),
+                }}
+              /> */}
+
               <StyledButton
                 fullWidth
                 variant="contained"
@@ -265,8 +268,6 @@ const RegisterPage = () => {
               >
                 Create Account
               </StyledButton>
-
-              
 
               <Box sx={{ mt: 3, textAlign: "center" }}>
                 <Typography
