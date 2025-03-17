@@ -14,11 +14,11 @@
 
 ## Technologies Used
 
-* **JavaScript:** Core programming language.
-* **(Potentially) Backend:** (Specify if you used Node.js, Express.js, etc.)
-* **(Potentially) Database:** (Specify if you used MongoDB, PostgreSQL, etc.)
-* **(Potentially) Frontend Framework/Library:** (Specify if you used React, Vue.js, etc.)
-* **(Potentially) Styling:** (Specify if you used CSS, Sass, Tailwind CSS, etc.)
+* ** Backend:** Nodejs , ExpressJs
+* ** Database:** MongoDB
+* ** Frontend Framework/Library:** ReactJs , Redux Toolkit
+* ** Styling:** Tailwind CSS , Material - UI
+* ** Payment:** Stripe
 
 ## Getting Started
 
