@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "start": "node index.js",
+    "build": "npm install",
     "dev": "nodemon index.js",
     "prod": "NODE_ENV=production node index.js",
     "dev:watch": "NODE_ENV=development nodemon index.js"
