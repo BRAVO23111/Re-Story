@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
-import { FaBook, FaBars, FaTimes, FaUserCircle, FaHome, FaSearch, FaStore, FaInfoCircle, FaEnvelope, FaShoppingCart } from "react-icons/fa";
+import { FaBook, FaBars, FaTimes, FaUserCircle, FaHome, FaSearch, FaStore, FaInfoCircle, FaEnvelope, FaShoppingCart, FaUserEdit } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { login, logout } from "../store/slices/authSlice";
-import { Button, Badge } from "@mui/material";
+import { Button, Badge, Menu, MenuItem, Divider } from "@mui/material";
 import { styled } from "@mui/material/styles";
+import api from "../config/config";
 
 // Styled Material UI Button
 const StyledButton = styled(Button)(() => ({
@@ -24,9 +25,29 @@ const NavBar = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [hasProfile, setHasProfile] = useState(false);
   
   const { isLoggedIn, username } = useSelector((state) => state.auth);
   const { cartItems } = useSelector((state) => state.cart);
+
+    const checkProfileStatus = async () => {
+    const token = window.localStorage.getItem("token");
+    const userId = window.localStorage.getItem("userId");
+    
+    if (token && userId) {
+      try {
+        await api.get(`/api/profile/${userId}`);
+        setHasProfile(true);
+      } catch (error) {
+        if (error.response?.status === 404) {
+          setHasProfile(false);
+        } else if (error.response?.status === 401) {
+          handleLogout();
+        }
+      }
+    }
+  };
 
   useEffect(() => {
     const token = window.localStorage.getItem("token");
@@ -37,19 +58,34 @@ const NavBar = () => {
         username: storedUsername, 
         token 
       }));
+      api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      checkProfileStatus();
+    } else {
+      dispatch(logout());
+      setHasProfile(false);
     }
-  }, [dispatch]);
+  }, []); // Remove isLoggedIn from dependencies to prevent circular updates
+
+  // Separate useEffect for profile status
+  useEffect(() => {
+    if (isLoggedIn) {
+      checkProfileStatus();
+    }
+  }, [isLoggedIn]);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("username");
+    localStorage.removeItem("userId");
+    delete api.defaults.headers.common['Authorization'];
     dispatch(logout());
+    setHasProfile(false);
     toast.success("Logged out successfully");
     navigate("/");
   };
 
   return (
-    <nav className="bg-gray-900 bg-opacity-80 backdrop-blur-md fixed w-full z-50 shadow-lg">
+    <nav className="bg-gray-900 bg-opacity-30  fixed w-full z-50 shadow-lg">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Left Section: Logo */}
@@ -108,18 +144,51 @@ const NavBar = () => {
             <div className="relative group">
               {isLoggedIn ? (
                 <div className="flex items-center space-x-2">
-                  <div className="flex items-center space-x-2 text-gray-300 hover:text-white cursor-pointer">
+                  <div 
+                    className="flex items-center space-x-2 text-gray-300 hover:text-white cursor-pointer"
+                    onClick={(e) => setAnchorEl(e.currentTarget)}
+                  >
                     <FaUserCircle className="text-2xl" />
                     <span>{username}</span>
                   </div>
-                  <div className="absolute right-0 mt-8 py-2 w-32 bg-white rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
-                    <button
-                      onClick={handleLogout}
-                      className="w-full text-left px-4 py-2 text-gray-700 hover:bg-red-50 hover:text-red-500 transition-colors"
+                  <Menu
+                    anchorEl={anchorEl}
+                    open={Boolean(anchorEl)}
+                    onClose={() => setAnchorEl(null)}
+                    PaperProps={{
+                      sx: {
+                        backgroundColor: 'white',
+                        width: '200px',
+                        mt: 1,
+                      }
+                    }}
+                  >
+                    {hasProfile ? (
+                      <MenuItem onClick={() => {
+                        navigate('/profile');
+                        setAnchorEl(null);
+                      }}>
+                        <FaUserEdit className="mr-2" /> View Profile
+                      </MenuItem>
+                    ) : (
+                      <MenuItem onClick={() => {
+                        navigate('/profile');
+                        setAnchorEl(null);
+                      }}>
+                        <FaUserEdit className="mr-2" /> Create Profile
+                      </MenuItem>
+                    )}
+                    <Divider />
+                    <MenuItem 
+                      onClick={() => {
+                        handleLogout();
+                        setAnchorEl(null);
+                      }}
+                      sx={{ color: 'red' }}
                     >
                       Logout
-                    </button>
-                  </div>
+                    </MenuItem>
+                  </Menu>
                 </div>
               ) : (
                 <StyledButton

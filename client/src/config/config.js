@@ -1,4 +1,5 @@
 import axios from "axios";
+import store from '../store/store';
 
 // frontend/src/config/config.js
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
@@ -12,6 +13,23 @@ const api = axios.create({
       'Content-Type': 'application/json'
     }
 });
+
+// Add request interceptor to include auth token
+api.interceptors.request.use(
+  (config) => {
+    let token = store.getState().auth.token;
+    if (!token) {
+      token = localStorage.getItem('token');
+    }
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
 
 // Add response interceptor for better error handling
 api.interceptors.response.use(

@@ -81,17 +81,31 @@ const LoginPage = () => {
         password,
       });
       
-      const token = response.data.token;
-      const storedUsername = window.localStorage.getItem("username");
+      const { token, userId, firstname } = response.data;
       
       window.localStorage.setItem("token", token);
+      window.localStorage.setItem("userId", userId);
+      window.localStorage.setItem("username", firstname);
       
       dispatch(login({ 
-        username: storedUsername,
+        username: firstname,
         token 
       }));
-      
-      navigation('/buy');
+
+      try {
+        const profileResponse = await api.get(`/api/profile/${userId}`);
+        if (profileResponse.status === 404) {
+          navigation('/profile');
+        } else {
+          navigation('/buy');
+        }
+      } catch (error) {
+        if (error.response?.status === 404) {
+          navigation('/profile');
+        } else {
+          navigation('/buy');
+        }
+      }
     } catch (error) {
       console.error("Login failed:", error);
       setError(error.response?.data?.message || "Login failed");

@@ -14,6 +14,7 @@ import cors from 'cors';
 import { UserRouter } from "./routes/UserRoutes.js";
 import { BooksSellingRoutes } from "./routes/BooksSellingRoutes.js";
 import { PaymentRoutes } from "./routes/PaymentRoutes.js";
+import { ProfileRoute } from './routes/ProfileRoutes.js';
 
 const app = express();
 
@@ -95,6 +96,7 @@ app.use((err, req, res, next) => {
 app.use("/api/auth", UserRouter);
 app.use("/api/books", BooksSellingRoutes);
 app.use("/api/payments" , PaymentRoutes);
+app.use("/api/profile" , ProfileRoute)
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

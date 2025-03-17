@@ -117,13 +117,8 @@ const RegisterPage = () => {
       window.localStorage.setItem("username", firstname);
       window.localStorage.setItem("registeredEmail", email);
 
-      dispatch(login({ 
-        username: firstname,
-        token: response.data.token 
-      }));
-
       navigate("/login");
-      alert("Registration successful! Please login with your credentials.");
+      alert("Registration successful! Please login to create your profile.");
     } catch (error) {
       console.error("Registration failed:", error);
       setError(error.response?.data?.message || "Registration failed");
